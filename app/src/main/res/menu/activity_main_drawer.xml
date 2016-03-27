@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Page">
+        <menu>
+            <item
+                android:id="@+id/drawer_timer"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Timer"/>
+
+            <item
+                android:id="@+id/drawer_news"
+                android:icon="@drawable/ic_menu_send"
+                android:title="News Feed"/>
+
+
+            <item android:id="@+id/drawer_map"
+                android:icon="@drawable/marker"
+                android:title="Map"/>
+        </menu>
+    </item>
+
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_camera"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Import" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Gallery" />
+        <item
+            android:id="@+id/nav_manage"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Tools" />
+    </group>
+
+
+
+</menu>

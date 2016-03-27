@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_id": "default-demo-app-7ccf7",
+    "project_number": "704020881372",
+    "name": "Default Demo App"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:704020881372:android:3906c18daf208077",
+        "client_id": "android:com.example.zadgargdvreadeageatkenneth.cityhuntgame.intro",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.example.zadgargdvreadeageatkenneth.cityhuntgame.intro",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "704020881372-c6qi8rbl4edgjp3v9nr6elg9b3ktd3qm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.zadgargdvreadeageatkenneth.cityhuntgame.intro",
+            "certificate_hash": "E1BAE424F1EB35D61E4B9A1AD3D149B254B05256"
+          }
+        },
+        {
+          "client_id": "704020881372-d236qoen4el4jg2380en8kjfvrh0edt6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
