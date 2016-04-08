@@ -74,6 +74,13 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyDLSRoDvK9br07PZmRQWyKS9DD9I5pGMpw"/>
         -->
+        <activity android:name=".intro.Intro"/>
+
+        <service
+            android:name="com.example.zadgargdvreadeageatkenneth.cityhuntgame.main.MyService"
+
+            >
+        </service>
 
 
     </application>

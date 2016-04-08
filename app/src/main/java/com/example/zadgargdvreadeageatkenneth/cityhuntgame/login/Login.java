@@ -20,15 +20,12 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.zadgargdvreadeageatkenneth.cityhuntgame.R;
 import com.example.zadgargdvreadeageatkenneth.cityhuntgame.cookie;
 import com.example.zadgargdvreadeageatkenneth.cityhuntgame.main.TAB;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -53,7 +50,7 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
-        Button button = (Button) findViewById(R.id.login_button);
+        Button button = (Button) findViewById(R.id.start_button);
 
         PD = new ProgressDialog(this);
         PD.setMessage("Loading.....");
@@ -188,6 +185,8 @@ public class Login extends AppCompatActivity {
                             toast.show();
                             Intent intent = new Intent(getBaseContext(), TAB.class);
                             startActivityForResult(intent, 0);
+                                teamName.setText("");
+                                teamPassword.setText("");
                             } else {
                             Toast.makeText(getApplicationContext(),
                             "WRONG TEAM NAME AND PASSWORD COMBINATION", Toast.LENGTH_SHORT).show();
@@ -222,10 +221,10 @@ public class Login extends AppCompatActivity {
 
 
         // get the password EditText
-        mEtPwd = (EditText) findViewById(R.id.password);
+
         // get the show/hide password Checkbox
          mCbShowPwd = (CheckBox) findViewById(R.id.showPW);
-        mEtPwd.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        teamPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
 
         // add onCheckedListener on checkbox
         // when user clicks on this checkbox, this is the handler.
@@ -235,10 +234,10 @@ public class Login extends AppCompatActivity {
                 // checkbox status is changed from uncheck to checked.
                 if (!isChecked) {
                     // show password
-                    mEtPwd.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                    teamPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
                 } else {
                     // hide password
-                    mEtPwd.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                    teamPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
                 }
             }
         });

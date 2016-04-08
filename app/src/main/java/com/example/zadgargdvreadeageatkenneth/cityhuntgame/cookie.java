@@ -1,5 +1,6 @@
 package com.example.zadgargdvreadeageatkenneth.cityhuntgame;
 
+import android.os.Handler;
 import android.widget.NumberPicker;
 
 /**
@@ -11,7 +12,9 @@ public class cookie {
     public static int eventID = 1;
     public static int OrganizerID = 1;
     public static int timeLength = 1;
-    static public  int marker_array_length ;
+    public static long startTime = 0;
+    public static int timerStarted = 0;
+    static public int marker_array_length = 0;
 
     //private static final cookie cookieHolder = new cookie();
     //public static cookie getInstance() {return cookieHolder;}
@@ -21,25 +24,31 @@ public class cookie {
 
     //public int  cookie(int initialValue){marker_array_length = initialValue;}
 
-    public  void setmListener(mListener listener){
+    public void setmListener(mListener listener) {
         mListener = listener;
     }
 
-    public static void setValue(int newValue){
+    public static void setValue(int newValue) {
         marker_array_length = newValue;
-        if(mListener != null){mListener.onValueChanged(marker_array_length);}
+        if (mListener != null) {
+            mListener.onValueChanged(marker_array_length);
+        }
 
     }
 
 
-
-    public int getValue(){
+    public int getValue() {
         return marker_array_length;
     }
 
-    public static interface  mListener{void onValueChanged(int newValue);};
-
+    public static interface mListener {
+        void onValueChanged(int newValue);
     }
+
+    ;
+
+
+}
 
 
 

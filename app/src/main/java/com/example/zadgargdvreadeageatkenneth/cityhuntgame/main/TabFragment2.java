@@ -12,8 +12,10 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
+import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -26,6 +28,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Layout;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -60,14 +63,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -98,8 +93,8 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 
-public class TabFragment2 extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
-        ,LocationListener, GoogleMap.OnMapLoadedCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
+public class TabFragment2 extends Cover implements NavigationView.OnNavigationItemSelectedListener
+        ,/*LocationListener,*/ GoogleMap.OnMapLoadedCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 
 
 {
@@ -116,6 +111,8 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
     protected LocationRequest mLocationRequest;
     protected String mLastUpdateTime;
     String url = "http://cityunt.16mb.com/putGPSdata_ken.php";
+
+    private MenuItem menuItem;
     //public int isGooglePlayServicesAvailable(context);
 
     protected void initializeContent() {
@@ -134,6 +131,11 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
         mapView = (MapView) findViewById(R.id.mapview);
         mapView.onCreate(savedInstanceState);
 
+        marker_requestQueue = Volley.newRequestQueue(this);
+        getdata getmydata = new getdata();
+        getmydata.togetdata();
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -142,8 +144,11 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
+        
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View headerView = navigationView.inflateHeaderView(R.layout.nav_header_main);
+        TextView user = (TextView) headerView.findViewById(R.id.user);
+        user.setText(cookie.teamName);
         navigationView.setNavigationItemSelectedListener(this);
 
 
@@ -176,9 +181,6 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
         refreshmap(mapView);
         int permissionCheck = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
-        //LatLng sydney = new LatLng(-34, 151);
-        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         MapsInitializer.initialize(this);
 
         cookie.setmListener(new cookie.mListener() {
@@ -193,6 +195,55 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
     }
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_introduction, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.action_settings:
+
+                menuItem =item;
+                menuItem.setActionView(R.layout.actionbar_indeterminate_progress);
+                menuItem.expandActionView();
+                refreshmap(mapView);
+                TestTask task = new TestTask();
+                task.execute("test");
+
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+
+    private class TestTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            // Simulate something long running
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            menuItem.collapseActionView();
+            menuItem.setActionView(null);
+        }
+    };
+
 
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -203,23 +254,26 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
 
         if (id == R.id.drawer_timer) {
             Intent intent = new Intent(this, TAB.class);
+            intent.putExtra(TAB.position,0);
             startActivityForResult(intent, 0);
 
         } else if (id == R.id.drawer_news) {
             Intent intent = new Intent(this, TAB.class);
+            intent.putExtra(TAB.position,1);
             startActivityForResult(intent, 0);
 
 
 
-        } else if (id == R.id.drawer_map){
+        }
+        else if (id == R.id.drawer_map){
             Intent intent = new Intent(this, TabFragment2.class);
             this.finish();
             startActivity(intent);}
-        else if (id == R.id.nav_camera) {
+       /** else if (id == R.id.nav_camera) {
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
 
-        } else if  (id == R.id.nav_manage) {
+        }*/ else if  (id == R.id.nav_manage) {
             IntentIntegrator scanIntegrator = new IntentIntegrator(this);
             scanIntegrator.initiateScan();
         }
@@ -234,9 +288,7 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
         if(scanningResult!=null){
             PD.show();
             String scanContent=scanningResult.getContents();
-            //String scanFormat=scanningResult.getFormatName();
             final String markerName = scanContent;
-            Log.v("markerName",markerName);
             String url = "http://cityunt.16mb.com/android_complete_task.php";
             done_marker_requestQueue = Volley.newRequestQueue(this);
             StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -250,6 +302,9 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
                         if (r == 0) {
                             Toast.makeText(getApplicationContext(),"failed to find", Toast.LENGTH_SHORT).show();
                         }else{Toast.makeText(getApplicationContext(),"YOU CAN GO TO NEXT POINT NOW", Toast.LENGTH_LONG).show();
+                            getdata getmydata = new getdata();
+                            getmydata.togetdata();
+
                         }
 
                     } catch (Exception e) {
@@ -272,7 +327,7 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
             done_marker_requestQueue.add(request);
 
         }else{
-            Toast.makeText(getApplicationContext(),"nothing",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"No QR code",Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -314,6 +369,9 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
+                if(mCurrentLocation!= null){
+                    sendGPS(mCurrentLocation);
+                }
                 setUpMap(googleMap);
 
             }
@@ -332,70 +390,32 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
         double sum_marker_lng = 0;
         //while(list.size() == 0){
             this.list = TAB.result;
-            //Log.v("tabtabtab",String.valueOf(TAB.result.size()));
-        //Log.v("tab2_lenght",String.valueOf(list.size()));
-        while(length !=cookie.marker_array_length || length == 0) {
+        CameraUpdate cameraUpdate1 = CameraUpdateFactory.newLatLngZoom(new LatLng(22.336206, 114.173049), 12);
+        mMap.animateCamera(cameraUpdate1);
+
+        while(length !=cookie.marker_array_length || length == 0 && cookie.marker_array_length !=0) {
             length = cookie.marker_array_length;
             for (int i = 0; i < length; i++) {
-                //Log.v("nononon", "nononon");
                 cardInfo ci = list.get(i);
                 sum_marker_lat += ci.marker_lat;
                 sum_marker_lng += ci.marker_lng;
-                //Log.v("marker_lat", String.valueOf(ci.marker_lat));
-                mMap.addMarker(new MarkerOptions().position(new LatLng(ci.marker_lat, ci.marker_lng)).title(ci.location));
-                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(sum_marker_lat / length, sum_marker_lng / length), 12);
-                mMap.animateCamera(cameraUpdate);
+                if(i!=0){
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(ci.marker_lat, ci.marker_lng)).title(ci.location).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_grey)));
+                    //CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(ci.marker_lat, ci.marker_lng), 12);
+                    //mMap.animateCamera(cameraUpdate);
+
+                }else{
+
+                mMap.addMarker(new MarkerOptions().position(new LatLng(ci.marker_lat, ci.marker_lng)).title(ci.location).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+                //CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(sum_marker_lat / length, sum_marker_lng / length), 12);
+                //mMap.animateCamera(cameraUpdate);
+                }
             }
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(sum_marker_lat / length, sum_marker_lng / length), 12);
+            mMap.animateCamera(cameraUpdate);
         }
 
     }
-/////////////nononononeed/////////////
-
-
-
-        /**
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,"http://cityunt.16mb.com/ShowMapLatLng.php",
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-
-                        try{
-                            JSONArray jsonArray = response.getJSONArray("u112713487_apps");
-                            int length=jsonArray.length();
-                            double sum_marker_lat = 0;
-                            double sum_marker_lng = 0;
-                            for(int i = 0; i<jsonArray.length();i++){
-                                JSONObject marker = jsonArray.getJSONObject(i);
-                                String markerName = marker.getString("markerName");
-                                double marker_lat= marker.getDouble("marker_lat");
-                                double marker_lng = marker.getDouble("marker_lng");
-                                sum_marker_lat += marker_lat;
-                                sum_marker_lng += marker_lng;
-
-                                //addmarker
-                                mMap.addMarker(new MarkerOptions().position(new LatLng(marker_lat, marker_lng)).title(markerName));
-
-                            }
-                            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(sum_marker_lat / length, sum_marker_lng / length), 12);
-                            mMap.animateCamera(cameraUpdate);
-
-                        }catch (JSONException e){
-                            e.printStackTrace();
-                        }
-                    }
-                },
-
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("VOLLEY", "ERROR");
-                    }
-                }
-        );
-        requestQueue.add(jsonObjectRequest);**/
-
-//}
-
     ////////////////GPS//////////////////////////////////
 
 
@@ -415,15 +435,15 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.v("onConnected","hi");
+        Log.v("onConnected", "hi");
         refreshmap(mapView);
         int permissionCheck = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
         mCurrentLocation = LocationServices
                 .FusedLocationApi
                 .getLastLocation( mGoogleApiClient );
-
         initCamera(mCurrentLocation);
+        sendGPS(mCurrentLocation);
     }
 
     @Override
@@ -431,6 +451,7 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
 
     }
 
+    /*
     @Override
     public void onLocationChanged(Location location) {
 
@@ -438,11 +459,15 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         LatLng latLng = new LatLng(latitude, longitude);
+        sendGPS(location);
+        Log.v("mycurrentlat", String.valueOf(latitude));
+        Log.v("mycurrentlng",String.valueOf(longitude));
         mMap.addMarker(new MarkerOptions().position(latLng));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
     }
+
 
     @Override
     public void onProviderDisabled(String provider) {
@@ -459,7 +484,7 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // TODO Auto-generated method stub
-    }
+    }**/
 
     private boolean isGooglePlayServicesAvailable() {
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
@@ -483,6 +508,8 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
         mMap.getUiSettings().setZoomControlsEnabled(true);
         if (location != null) {
             sendGPS(location);
+            Log.v("mycurrentlat", String.valueOf(location.getLatitude()));
+            Log.v("mycurrentlng", String.valueOf(location.getLongitude()));
             CameraPosition position = CameraPosition.builder()
                     .target(new LatLng(location.getLatitude(),
                             location.getLongitude()))
@@ -524,7 +551,7 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
         StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.v("insert GPS","okokok");
+                Log.v("GPSok?",response);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -539,9 +566,9 @@ public class TabFragment2 extends AppCompatActivity implements NavigationView.On
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("team_lat", String.valueOf(location.getLatitude()));
                 params.put("team_lng",String.valueOf(location.getLongitude()));
-                params.put("teamID", "2");
-                params.put("eventID", "2");
-                params.put("OrganizerID","2");
+                params.put("teamID", String.valueOf(cookie.teamID));
+                params.put("eventID", String.valueOf(cookie.eventID));
+                params.put("OrganizerID",String.valueOf(cookie.OrganizerID));
                 return params;
             }
         };

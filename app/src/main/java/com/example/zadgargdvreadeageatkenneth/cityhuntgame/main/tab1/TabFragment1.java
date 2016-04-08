@@ -57,28 +57,33 @@ public class TabFragment1 extends Fragment {
         String text = String.valueOf(length);
 
 
+
         timerTextView = (TextView) view.findViewById(R.id.timerTextView);
 
-        Button b = (Button) view.findViewById(R.id.login_button);
+        Button b = (Button) view.findViewById(R.id.start_button);
         b.setText("start");
+        if(cookie.timerStarted==1){b.setClickable(false);}
+
         b.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 Button b = (Button) v;
                 if (b.getText().equals("stop")) {
-                    timerHandler.removeCallbacks(timerRunnable);
-                    b.setText("cont");
+                    //timerHandler.removeCallbacks(timerRunnable);
+                    //b.setText("cont");
                 } else if(b.getText().equals("start")){
+                    b.setClickable(false);
+                    cookie.timerStarted = 1;
                     startTime = System.currentTimeMillis();
                     timerHandler.postDelayed(timerRunnable, 0);
-                    b.setText("stop");
+                    //b.setText("stop");
                 }else{timerHandler.post(timerRunnable);
                     b.setText("stop");}
             }
         });
 
-        Button bb = (Button) view.findViewById(R.id.restart);
+        /**Button bb = (Button) view.findViewById(R.id.restart);
         bb.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View q){
@@ -89,7 +94,7 @@ public class TabFragment1 extends Fragment {
                 timerTextView.setText(String.format("%d:%02d:%03d", length, 00,0000 ));
             }
 
-        });
+        });**/
 
 
 
@@ -102,7 +107,7 @@ public class TabFragment1 extends Fragment {
     public void onPause() {
         super.onPause();
         timerHandler.removeCallbacks(timerRunnable);
-        Button b = (Button) getView().findViewById(R.id.login_button);
+        Button b = (Button) getView().findViewById(R.id.start_button);
         b.setText("start");
     }
 }

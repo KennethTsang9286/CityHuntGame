@@ -37,7 +37,7 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.ContactViewHol
 
     @Override
     public int getItemCount() {
-        Log.v("Contat.size",String.valueOf(contactList.size()));
+        //Log.v("Contat.size",String.valueOf(contactList.size()));
         //Log.v("trytrytry", String.valueOf(cookie.marker_array_length));
         return contactList.size();
     }

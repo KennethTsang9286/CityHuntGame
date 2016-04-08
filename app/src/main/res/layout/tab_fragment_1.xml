@@ -8,28 +8,31 @@
         android:id="@+id/timerTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:gravity="center"
         android:textSize="48sp"
         android:textColor="#FF0000"
         android:text="Are you ready?"
-        android:layout_alignEnd="@+id/login_button"
-        android:layout_above="@+id/login_button" />
+        android:layout_below="@+id/restart"
+        android:layout_toRightOf="@+id/restart"
+        android:layout_toEndOf="@+id/restart"
+        android:layout_centerInParent="true" />
 
     <Button android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:text="button"
-        android:id="@+id/login_button"
+        android:id="@+id/start_button"
         android:onClick="click"
         android:gravity = "center_horizontal"
-        android:layout_above="@+id/restart"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
-    <Button android:layout_height="wrap_content"
+   <Button android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:text="restart"
         android:id="@+id/restart"
         android:layout_alignParentBottom="true"
-        android:gravity = "center_horizontal"/>
+        android:gravity = "center_horizontal"
+       android:visibility="gone" />
 
 </RelativeLayout>

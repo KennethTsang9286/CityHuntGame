@@ -1,7 +1,9 @@
 package com.example.zadgargdvreadeageatkenneth.cityhuntgame.main;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -22,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,14 +59,14 @@ import java.util.Map;
 /**
  * Created by TKenneth on 1/3/16.
  */
-public class TAB extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
-    static public List result = new ArrayList();
-    private RequestQueue marker_requestQueue;
+public class TAB extends Cover implements NavigationView.OnNavigationItemSelectedListener{
+    //static public List result = new ArrayList();
+    //private RequestQueue marker_requestQueue;
     private RequestQueue done_marker_requestQueue;
     ProgressDialog PD;
-
-
-
+    public static final String position = "position";
+    private MenuItem menuItem;
+    //private static final String position1 = "position1";
 
 
 
@@ -79,7 +82,11 @@ public class TAB extends AppCompatActivity implements NavigationView.OnNavigatio
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
+        //askTime();
+
         initializeContent();
+
 
         marker_requestQueue = Volley.newRequestQueue(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -135,6 +142,14 @@ public class TAB extends AppCompatActivity implements NavigationView.OnNavigatio
             }
         });
 
+
+
+        int position = getIntent().getIntExtra("position",0);
+        if(position == 1){
+            tabLayout.getTabAt(1).select();
+        }else if(position ==0){tabLayout.getTabAt(0).select();}
+
+
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent){
@@ -144,7 +159,7 @@ public class TAB extends AppCompatActivity implements NavigationView.OnNavigatio
             String scanContent=scanningResult.getContents();
             //String scanFormat=scanningResult.getFormatName();
             final String markerName = scanContent;
-            Log.v("markerName",markerName);
+            //Log.v("markerName",markerName);
             String url = "http://cityunt.16mb.com/android_complete_task.php";
             done_marker_requestQueue = Volley.newRequestQueue(this);
             StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -157,7 +172,10 @@ public class TAB extends AppCompatActivity implements NavigationView.OnNavigatio
                         int r = Integer.parseInt(rr);
                         if (r == 0) {
                             Toast.makeText(getApplicationContext(),"failed to find", Toast.LENGTH_SHORT).show();
-                        }else{Toast.makeText(getApplicationContext(),"YOU CAN GO TO NEXT POINT NOW", Toast.LENGTH_LONG).show();}
+                        }else{Toast.makeText(getApplicationContext(),"YOU CAN GO TO NEXT POINT NOW", Toast.LENGTH_LONG).show();
+                            getdata getmydata = new getdata();
+                            getmydata.togetdata();
+                        }
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -167,8 +185,8 @@ public class TAB extends AppCompatActivity implements NavigationView.OnNavigatio
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     PD.dismiss();
-                    Toast.makeText(getApplicationContext(),
-                            "failed to connect", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(),
+                    //        "failed to connect", Toast.LENGTH_SHORT).show();
                 }
             }){@Override
             protected Map<String, String> getParams(){
@@ -178,9 +196,11 @@ public class TAB extends AppCompatActivity implements NavigationView.OnNavigatio
             }};
             done_marker_requestQueue.add(request);
         }else{
-            Toast.makeText(getApplicationContext(),"nothing",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"No QR code",Toast.LENGTH_SHORT).show();
         }
     }
+
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -190,21 +210,25 @@ public class TAB extends AppCompatActivity implements NavigationView.OnNavigatio
 
         if (id == R.id.drawer_timer) {
             Intent intent = new Intent(this, TAB.class);
+            intent.putExtra(TAB.position,0);
             this.finish();
             startActivity(intent);
         }
         else if(id==R.id.drawer_news) {
             Intent intent = new Intent(this, TAB.class);
+            intent.putExtra(TAB.position, 1);
             this.finish();
             startActivity(intent);
         } else if (id == R.id.drawer_map){
                 Intent intent = new Intent(this, TabFragment2.class);
                 startActivityForResult(intent, 0);
-        } else if (id == R.id.nav_camera) {
+        }
+        //else if (id == R.id.nav_camera) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+       // } else if (id == R.id.nav_gallery) {
 
-        } else if  (id == R.id.nav_manage) {
+        //}
+        else if  (id == R.id.nav_manage) {
             IntentIntegrator scanIntegrator = new IntentIntegrator(this);
             scanIntegrator.initiateScan();
 
@@ -218,6 +242,55 @@ public class TAB extends AppCompatActivity implements NavigationView.OnNavigatio
 
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_introduction, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.action_settings:
+
+                menuItem =item;
+                menuItem.setActionView(R.layout.actionbar_indeterminate_progress);
+                menuItem.expandActionView();
+                getdata getmydata = new getdata();
+                getmydata.togetdata();
+                TestTask task = new TestTask();
+                task.execute("test");
+
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+
+    private class TestTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            // Simulate something long running
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            menuItem.collapseActionView();
+            menuItem.setActionView(null);
+        }
+    };
 
 
 
@@ -228,6 +301,12 @@ public class TAB extends AppCompatActivity implements NavigationView.OnNavigatio
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+            cookie.teamName = "";
+            cookie.teamID = 1;
+            cookie.eventID = 1;
+            cookie.OrganizerID = 1;
+            cookie.timeLength = 1;
+            cookie.marker_array_length = 0 ;
         }
     }
 
@@ -285,76 +364,6 @@ public class TAB extends AppCompatActivity implements NavigationView.OnNavigatio
     }
 
 
-public class getdata {
-
-    public void togetdata() {
-
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("teamID", String.valueOf(cookie.teamID));
-        params.put("eventID", String.valueOf(cookie.eventID));
-        params.put("OrganizerID",String.valueOf(cookie.OrganizerID));
-
-
-        CustomRequest jsonObjectRequest = new CustomRequest(Request.Method.POST, "http://cityunt.16mb.com/android_getMarker.php",params,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-
-                        try {
-                            Log.v("success",response.getString("success"));
-                            if(Integer.parseInt(response.getString("success"))==0){
-                                Toast toast = Toast.makeText(getApplicationContext(),"Oops, nothing to show",Toast.LENGTH_SHORT);
-                                toast.setGravity(Gravity.CENTER,0,0);
-                                toast.show();
-                            }else{
-                            JSONArray jsonArray = response.getJSONArray("u112713487_apps");
-                            int length = jsonArray.length();
-                            result.clear();
-
-                            for (int i = 0; i < length; i++) {
-
-                                JSONObject marker = jsonArray.getJSONObject(i);
-                                cardInfo ci = new cardInfo();
-                                ci.location = marker.getString("markerName");
-                                ci.description = marker.getString("marker_description");
-                                ci.marker_lat = marker.getDouble("marker_lat");
-                                ci.marker_lng = marker.getDouble("marker_lng");
-                                Log.v("data_" + String.valueOf(i), ci.location);
-                                System.out.println();
-                                this.getClass();
-                                result.add(ci);
-                            }
-
-                            cookie.setValue(length);
-                            Log.v("useless.lenght22222", String.valueOf(cookie.marker_array_length));}
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("VOLLEY", "ERROR");
-                        Toast.makeText(getApplicationContext(), "CONNECTION PROBLEM", Toast.LENGTH_SHORT).show();
-                    }
-                }
-        );
-        marker_requestQueue.add(jsonObjectRequest);
-
-        //Log.v("result.size", String.valueOf(result.size()));
-
-        if (result == null) {
-            Toast.makeText(getApplicationContext(), "null result", Toast.LENGTH_SHORT).show();
-        }
-
-
-    }
-
-}
 
 }
     //public static int marker_array_length = getdata().array_lenght[0];
